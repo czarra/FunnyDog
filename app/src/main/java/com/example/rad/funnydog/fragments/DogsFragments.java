@@ -42,7 +42,7 @@ public class DogsFragments extends Fragment {
     private int selectedSpinner = 1;
     private Button buttonRun;
     
-    public static DogsFragments newInstance(String key) {
+    public static DogsFragments newInstance() {
         DogsFragments fragment = new DogsFragments();
         Bundle args = new Bundle();
         fragment.setArguments(args);
@@ -56,7 +56,7 @@ public class DogsFragments extends Fragment {
         recyclerView = (RecyclerView) view.findViewById(R.id.list);
         LinearLayoutManager layoutManager = new LinearLayoutManager(context);
         layoutManager.setSmoothScrollbarEnabled(true);
-        listener = (OnFragmentInteractionListener) context;
+       // listener = (OnFragmentInteractionListener) context;
         progressBar1 = (ProgressBar) view.findViewById(R.id.progressBar1);
         buttonRun = (Button) view.findViewById(R.id.buttonRun) ;
         recyclerView.setLayoutManager(new LinearLayoutManager(context));
@@ -72,7 +72,7 @@ public class DogsFragments extends Fragment {
                 Log.e("position", position+"  aa");
                 switch (position) {
                     default:
-                        selectedSpinner = position;
+                        selectedSpinner = position+1;
 
                 }
 
@@ -123,6 +123,7 @@ public class DogsFragments extends Fragment {
         buttonRun.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Log.e("Click","click");
                 retrieveDogsTask = forButtons();
                 retrieveDogsTask.execute();
                 recyclerView.scrollToPosition(0);
@@ -174,7 +175,7 @@ public class DogsFragments extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        listener = (OnFragmentInteractionListener) context;
+       // listener = (OnFragmentInteractionListener) context;
     }
 
     class RetrieveDogsTask extends AsyncTask<String, String, List<Dogs>> {
@@ -191,7 +192,7 @@ public class DogsFragments extends Fragment {
                 String jsonResponse = client.getURL(url, String.class);
                 Log.d("jsonResponse",jsonResponse);
                 JSONObject jsonObject = new JSONObject(jsonResponse);
-                JSONArray dogs = jsonObject.getJSONArray("content");
+                JSONArray dogs = jsonObject.getJSONArray("data");
 
                 for (int i = 0; i < dogs.length(); i++) {
                     JSONObject articlesObject = dogs.getJSONObject(i);
