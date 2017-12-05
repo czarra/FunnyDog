@@ -94,10 +94,8 @@ public class MyDogsFragments extends Fragment {
         });
         // Spinner Drop down elements
         List<String> categories = new ArrayList<String>();
-        /*for(int i = 1 ;i<= 20; i++){
-            categories.add(""+i);
-        }*/
-        categories.add("Data dodania roznąco");// 0 -rosnaco
+
+        categories.add("Data dodania rosnąco");// 0 -rosnaco
         categories.add("Data dodania malejąco");// 1 -manlejąco
 
         // Creating adapter for spinner
