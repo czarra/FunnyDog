@@ -126,6 +126,7 @@ public class DogsFragments extends Fragment {
             @Override
             protected void onPostExecute(List<Dogs> list) {
                 adapter.dogs.clear();
+                list_dogs.clear();
                 for (int i = 0; i < list.size(); i++) {
                     adapter.dogs.add(list.get(i));
                     list_dogs.add(list.get(i));
