@@ -1,5 +1,6 @@
 <resources>
     <string name="app_name">Funny Dog</string>
     <string name="start">Moje ulubione</string>
-
+    <string name="favorite">Moje ulubione</string>
+    <string name="empty">Brak elementów do wyświetlenia</string>
 </resources>

@@ -1,6 +1,8 @@
 package com.example.rad.funnydog.fragments;
 
 import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -15,6 +17,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.rad.funnydog.R;
@@ -27,24 +30,27 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
+import static android.content.Context.MODE_PRIVATE;
+
 /**
  * Created by Rad on 2017-12-04.
  */
 
-public class DogsFragments extends Fragment {
+public class MyDogsFragments extends Fragment {
 
     private OnFragmentInteractionListener listener;
-    private MyDogsRecyclerViewAdapter adapter;
+    private MyFavoriteDogsRecyclerViewAdapter adapter;
     private Context context;
     private RetrieveDogsTask retrieveDogsTask;
     RecyclerView recyclerView;
     private ProgressBar progressBar1;
-    private int selectedSpinner = 1;
+    private int selectedSpinner = 0;
     private Button buttonRun;
-    private List<Dogs> list_dogs = new ArrayList<>();
+    private SQLiteDatabase myDataBase;
+    private TextView empty;
     
-    public static DogsFragments newInstance() {
-        DogsFragments fragment = new DogsFragments();
+    public static MyDogsFragments newInstance() {
+        MyDogsFragments fragment = new MyDogsFragments();
         Bundle args = new Bundle();
         fragment.setArguments(args);
         return fragment;
@@ -52,7 +58,7 @@ public class DogsFragments extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_dogs, container, false);
+        View view = inflater.inflate(R.layout.fragment_favorite_dogs, container, false);
         context = view.getContext();
         recyclerView = (RecyclerView) view.findViewById(R.id.list);
         LinearLayoutManager layoutManager = new LinearLayoutManager(context);
@@ -61,6 +67,7 @@ public class DogsFragments extends Fragment {
         progressBar1 = (ProgressBar) view.findViewById(R.id.progressBar1);
         buttonRun = (Button) view.findViewById(R.id.buttonRun) ;
         recyclerView.setLayoutManager(new LinearLayoutManager(context));
+        empty = (TextView)   view.findViewById(R.id.empty) ;
 
         Spinner spinner = (Spinner) view.findViewById(R.id.spinner);
 
@@ -73,7 +80,7 @@ public class DogsFragments extends Fragment {
                 Log.e("position", position+"  aa");
                 switch (position) {
                     default:
-                        selectedSpinner = position+1;
+                        selectedSpinner = position;
 
                 }
 
@@ -87,9 +94,11 @@ public class DogsFragments extends Fragment {
         });
         // Spinner Drop down elements
         List<String> categories = new ArrayList<String>();
-        for(int i = 1 ;i<= 20; i++){
+        /*for(int i = 1 ;i<= 20; i++){
             categories.add(""+i);
-        }
+        }*/
+        categories.add("Data dodania roznąco");// 0 -rosnaco
+        categories.add("Data dodania malejąco");// 1 -manlejąco
 
         // Creating adapter for spinner
         ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(context,R.layout.simple_spinner_item, categories);
@@ -98,11 +107,12 @@ public class DogsFragments extends Fragment {
         // attaching data adapter to spinner
         spinner.setAdapter(dataAdapter);
 
-        adapter = new MyDogsRecyclerViewAdapter(new ArrayList<Dogs>(), listener);
+        adapter = new MyFavoriteDogsRecyclerViewAdapter(new ArrayList<Dogs>(), listener);
 
         retrieveDogsTask = forButtons();
         retrieveDogsTask.execute();
         recyclerView.setAdapter(adapter);
+
         buttonRun.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -128,7 +138,9 @@ public class DogsFragments extends Fragment {
                 adapter.dogs.clear();
                 for (int i = 0; i < list.size(); i++) {
                     adapter.dogs.add(list.get(i));
-                    list_dogs.add(list.get(i));
+                }
+                if(list.size()==0){
+                    empty.setVisibility(View.VISIBLE);
                 }
                 adapter.notifyDataSetChanged();
                 progressBar1.setVisibility(View.GONE);
@@ -154,34 +166,6 @@ public class DogsFragments extends Fragment {
         // TODO: Update argument type and name
         void onFragmentInteraction(Dogs item);
     }
-    @Override
-    public void onResume(){
-        super.onResume();
-        Log.d("Restart fragment","Dogs");
-        if(list_dogs.size()!=0) {
-            retrieveDogsTask = new RetrieveDogsTask() {
-                @Override
-                protected void onPreExecute() {
-                    progressBar1.setVisibility(View.VISIBLE);
-                    recyclerView.setVisibility(View.GONE);
-                }
-
-                @Override
-                protected void onPostExecute(List<Dogs> list) {
-                    adapter.dogs.clear();
-                    for (int i = 0; i <  list_dogs.size(); i++) {
-                        adapter.dogs.add(list_dogs.get(i));
-                    }
-                    adapter.notifyDataSetChanged();
-                    progressBar1.setVisibility(View.GONE);
-                    recyclerView.setVisibility(View.VISIBLE);
-
-                }
-            };
-
-            retrieveDogsTask.execute();
-        }
-    }
 
     @Override
     public void onAttach(Context context) {
@@ -194,27 +178,32 @@ public class DogsFragments extends Fragment {
         List<Dogs> list = new ArrayList<>();
         @Override
         protected List<Dogs> doInBackground(String... urls) {
-            String url = "https://api.thedogapi.co.uk/v2/dog.php?limit=";
-            url +=selectedSpinner;
 
             try {
-                Log.d("url",url);
-                String jsonResponse = client.getURL(url, String.class);
-                Log.d("jsonResponse",jsonResponse);
-                JSONObject jsonObject = new JSONObject(jsonResponse);
-                JSONArray dogs = jsonObject.getJSONArray("data");
-
-                for (int i = 0; i < dogs.length(); i++) {
-                    JSONObject articlesObject = dogs.getJSONObject(i);
-                    Dogs item = Dogs.fromJsonObject(articlesObject);
-
-                    if(item!=null) {
-                        list.add(item);
-                    }
+                myDataBase = context.openOrCreateDatabase("Dogs", MODE_PRIVATE, null);
+                String query = "SELECT * FROM Dog ";
+                if(selectedSpinner==1){
+                    query +=" ORDER BY time DESC";
+                }else {
+                    query +=" ORDER BY time ASC";
                 }
+                Cursor cursor = myDataBase.rawQuery(query, null);
+                Log.e("in base",""+cursor.getCount());
+
+                 while (cursor.moveToNext()) {
+                     Dogs item  = new Dogs(""+cursor.getString(1),""+cursor.getString(2),
+                             ""+cursor.getString(3),""+cursor.getString(4));
+                   //  Log.d("in base in: ",""+cursor.getString(1));// id
+                    // Log.d("in base in: ",""+cursor.getString(2));//url
+                     //Log.d("in base in: ",""+cursor.getString(3));//time
+                    // Log.d("in base in: ",""+cursor.getString(4));//form
+                     item.setStar(true);
+                     list.add(item);
+                }
+                myDataBase.close();
                 return list;
-            } catch (Exception exp) {
-                Log.e("Articles error",exp.getMessage());
+            }catch(Exception ex){
+                Log.e("select","Erro in geting id "+ex.toString());
             }
             return new ArrayList<>();
         }

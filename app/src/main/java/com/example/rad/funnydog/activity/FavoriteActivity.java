@@ -1,12 +1,11 @@
 package com.example.rad.funnydog.activity;
 
-import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
@@ -16,28 +15,29 @@ import android.widget.Toast;
 import com.example.rad.funnydog.R;
 import com.example.rad.funnydog.data.Dogs;
 import com.example.rad.funnydog.fragments.DogsFragments;
+import com.example.rad.funnydog.fragments.MyDogsFragments;
 
-public class MainActivity extends AppCompatActivity  implements DogsFragments.OnFragmentInteractionListener {
+public class FavoriteActivity extends AppCompatActivity  implements MyDogsFragments.OnFragmentInteractionListener {
 
     private SQLiteDatabase myDataBase;
-    private final String CREATE_TABLE = "CREATE TABLE IF NOT EXISTS Dog( ID integer primary key autoincrement,ID_DOG VARCHAR,URL VARCHAR, TIME INT, FORMAT VARCHAR);";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        myDataBase = openOrCreateDatabase("Dogs", MODE_PRIVATE, null);
-        myDataBase.execSQL(CREATE_TABLE);
+
 
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_favorite);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        loadFragment(DogsFragments.newInstance());
-        myDataBase.close();
+        getSupportActionBar().setHomeButtonEnabled(true);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
+        loadFragment(MyDogsFragments.newInstance());
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
+        //getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
     }
 
@@ -49,10 +49,8 @@ public class MainActivity extends AppCompatActivity  implements DogsFragments.On
         int id = item.getItemId();
 
 
-        if (id == R.id.start) {
-            Intent mIntent = new Intent(MainActivity.this, FavoriteActivity.class);
-            startActivity(mIntent);
-
+        if(id == android.R.id.home){
+            finish();
             return true;
         }
 
@@ -62,7 +60,7 @@ public class MainActivity extends AppCompatActivity  implements DogsFragments.On
 
     private void loadFragment(Fragment fragment) {
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.replace(R.id.content_main, fragment);
+        transaction.replace(R.id.content_favorite, fragment);
         transaction.commit();
     }
 
@@ -71,15 +69,15 @@ public class MainActivity extends AppCompatActivity  implements DogsFragments.On
 
         try {
             myDataBase = openOrCreateDatabase("Dogs", MODE_PRIVATE, null);
-            String query = "SELECT * FROM Dog WHERE ID_DOG LIKE '" + item.id + "'";
+            String query = "SELECT * FROM Dog WHERE ID_DOG LIKE '"+item.id+"'";
             Cursor cursor = myDataBase.rawQuery(query, null);
-            Log.e("in base", "" + cursor.getCount());
-            CharSequence text = "";
-            if (cursor.getCount() > 0) {
-                myDataBase.execSQL("DELETE FROM Dog WHERE ID_DOG LIKE '" + item.id + "'");
+            Log.e("in base",""+cursor.getCount());
+            CharSequence text ="";
+            if(cursor.getCount()>0){
+                myDataBase.execSQL("DELETE FROM Dog WHERE ID_DOG LIKE '"+item.id+"'");
                 text = "Usunięto z ulubionych";
 
-            } else {
+            }else {
                 myDataBase.execSQL("INSERT INTO Dog (ID_DOG ,URL , TIME, FORMAT ) VALUES('" +
                         item.id + "','" +
                         item.url + "','" +
@@ -90,19 +88,9 @@ public class MainActivity extends AppCompatActivity  implements DogsFragments.On
             int duration = Toast.LENGTH_SHORT;
             Toast toast = Toast.makeText(this, text, duration);
             toast.show();
-            // while (cursor.moveToNext()) {
-            //cursor.getString(cursor.getColumnIndex("allFriends"));
-            //}
             myDataBase.close();
-        } catch (Exception ex) {
-            Log.e("select", "Erro in geting id " + ex.toString());
+        }catch(Exception ex){
+            Log.e("select","Erro in geting id "+ex.toString());
         }
     }
-    @Override
-    public void onDestroy(){
-        myDataBase.close();
-        super.onDestroy();
-
-    }
-
 }

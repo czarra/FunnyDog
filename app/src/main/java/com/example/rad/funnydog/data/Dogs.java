@@ -34,7 +34,7 @@ public class Dogs {
     }
 
 
-    private Dogs(String id, String url, String time, String format ) {
+    public Dogs(String id, String url, String time, String format ) {
         this.id = id;
         this.url = url;
         this.time = time;
