@@ -78,7 +78,7 @@ public class MyDogsRecyclerViewAdapter extends RecyclerView.Adapter<MyDogsRecycl
         myDataBase.close();
         Picasso.with(context)
                 .load(dogs.get(position).url)
-                .resize(800,800)
+                .resize(700,700)
                 .centerCrop()
                 .into(holder.imageDog);
 

@@ -72,7 +72,7 @@ public class MyFavoriteDogsRecyclerViewAdapter extends RecyclerView.Adapter<MyFa
         }
         myDataBase.close();
        //Log.e("text",dogs.get(position).url);
-        holder.url.setText("Idż do psa");
+        holder.url.setText(R.string.go_to);
         holder.url.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -86,7 +86,7 @@ public class MyFavoriteDogsRecyclerViewAdapter extends RecyclerView.Adapter<MyFa
 
         Picasso.with(context)
                 .load(dogs.get(position).url)
-                .resize(1000,1000)
+                .resize(700,700)
                 .centerCrop()
                 .into(holder.imageDog);
 
