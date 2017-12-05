@@ -1,6 +1,8 @@
 package com.example.rad.funnydog.fragments;
 
 import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -8,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.rad.funnydog.R;
 import com.example.rad.funnydog.data.Dogs;
@@ -18,6 +21,8 @@ import org.json.JSONObject;
 
 import java.util.List;
 
+import static android.content.Context.MODE_PRIVATE;
+
 /**
  * Created by Rad on 2017-11-06.
  */
@@ -27,6 +32,7 @@ public class MyDogsRecyclerViewAdapter extends RecyclerView.Adapter<MyDogsRecycl
     public final List<Dogs> dogs;
     private final DogsFragments.OnFragmentInteractionListener listener;
     private Context context;
+    private SQLiteDatabase myDataBase;
 
     public MyDogsRecyclerViewAdapter(List<Dogs> dogs,
                                      DogsFragments.OnFragmentInteractionListener listener) {
@@ -43,17 +49,45 @@ public class MyDogsRecyclerViewAdapter extends RecyclerView.Adapter<MyDogsRecycl
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, final int position) {
+        myDataBase = context.openOrCreateDatabase("Dogs", MODE_PRIVATE, null);
+        try {
+            String query = "SELECT * FROM Dog WHERE ID_DOG LIKE '"+dogs.get(position).id+"'";
+            Cursor cursor = myDataBase.rawQuery(query, null);
+            Log.d("in base",""+cursor.getCount());
+            CharSequence text ="";
+            if(cursor.getCount()>0){
+                holder.imageStar.setVisibility(View.VISIBLE);
+                dogs.get(position).setStar(true);
+            }else {
+                holder.imageStar.setVisibility(View.GONE);
+                dogs.get(position).setStar(false);
+            }
 
-
+            // while (cursor.moveToNext()) {
+            //cursor.getString(cursor.getColumnIndex("allFriends"));
+            //}
+        }catch(Exception ex){
+            Log.e("select","Erro in geting id "+ex.toString());
+        }
 
         Picasso.with(context)
                 .load(dogs.get(position).url)
+                .resize(1000,1000)
+                .centerCrop()
                 .into(holder.imageDog);
 
         holder.view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (null != listener) {
+                    Log.d("action Listener","click"+dogs.get(position).getStar());
+                    if(!dogs.get(position).getStar()){
+                        holder.imageStar.setVisibility(View.VISIBLE);
+                        dogs.get(position).setStar(true);
+                    } else {
+                        holder.imageStar.setVisibility(View.GONE);
+                        dogs.get(position).setStar(false);
+                    }
                     // Notify the active callbacks interface (the activity, if the
                     // fragment is attached to one) that an item has been selected.
                     listener.onFragmentInteraction(dogs.get(position));
@@ -72,13 +106,14 @@ public class MyDogsRecyclerViewAdapter extends RecyclerView.Adapter<MyDogsRecycl
     class ViewHolder extends RecyclerView.ViewHolder {
         public final View view;
         final ImageView imageDog;
+        final ImageView imageStar;
 
 
         ViewHolder(View view) {
             super(view);
             this.view = view;
             imageDog = (ImageView) view.findViewById(R.id.imageDog);
-
+            imageStar = (ImageView) view.findViewById(R.id.imageStar);
 
         }
     }

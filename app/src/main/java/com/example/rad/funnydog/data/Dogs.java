@@ -27,6 +27,7 @@ public class Dogs {
     public final String url;
     public final String time;
     public final String format;
+    private boolean star = false;
 
     public Dogs() {
         this(null,null,null,null);
@@ -46,6 +47,12 @@ public class Dogs {
         return "id=" + id + " url= " + url + ", format=" + format;
     }
 
+    public void setStar(boolean star){
+        this.star = star;
+    }
+    public Boolean getStar(){
+        return this.star;
+    }
 
 
 }

@@ -10,18 +10,28 @@
         android:id="@+id/real"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="15pt"
+        android:layout_marginEnd="7.5pt"
         android:layout_marginStart="7.5pt"
         android:layout_marginTop="10pt"
         android:orientation="horizontal">
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+            <ImageView
+                android:id="@+id/imageDog"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:scaleType="centerInside"
+                android:src="@mipmap/ic_launcher" />
 
         <ImageView
-            android:id="@+id/imageDog"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:id="@+id/imageStar"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentTop="true"
             android:src="@mipmap/ic_launcher" />
-
-
+    </RelativeLayout>
     </LinearLayout>
 
     <View

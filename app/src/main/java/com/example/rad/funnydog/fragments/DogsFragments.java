@@ -56,7 +56,7 @@ public class DogsFragments extends Fragment {
         recyclerView = (RecyclerView) view.findViewById(R.id.list);
         LinearLayoutManager layoutManager = new LinearLayoutManager(context);
         layoutManager.setSmoothScrollbarEnabled(true);
-       // listener = (OnFragmentInteractionListener) context;
+        listener = (OnFragmentInteractionListener) context;
         progressBar1 = (ProgressBar) view.findViewById(R.id.progressBar1);
         buttonRun = (Button) view.findViewById(R.id.buttonRun) ;
         recyclerView.setLayoutManager(new LinearLayoutManager(context));
@@ -123,7 +123,6 @@ public class DogsFragments extends Fragment {
         buttonRun.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.e("Click","click");
                 retrieveDogsTask = forButtons();
                 retrieveDogsTask.execute();
                 recyclerView.scrollToPosition(0);
@@ -175,7 +174,6 @@ public class DogsFragments extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-       // listener = (OnFragmentInteractionListener) context;
     }
 
     class RetrieveDogsTask extends AsyncTask<String, String, List<Dogs>> {
