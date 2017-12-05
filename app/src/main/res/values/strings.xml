@@ -4,4 +4,9 @@
     <string name="favorite">Moje ulubione</string>
     <string name="empty">Brak elementów do wyświetlenia</string>
     <string name="go_to">Zobacz obraz</string>
+    <string name="pictute_text">Liczba zdjęć</string>
+    <string name="find">Losuj</string>
+    <string name="find_run">Uruchom</string>
+    <string name="sort">Sortuj</string>
+
 </resources>
