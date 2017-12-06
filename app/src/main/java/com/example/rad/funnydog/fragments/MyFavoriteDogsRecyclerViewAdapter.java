@@ -15,6 +15,10 @@ import android.widget.TextView;
 
 import com.example.rad.funnydog.R;
 import com.example.rad.funnydog.data.Dogs;
+import com.squareup.picasso.Cache;
+import com.squareup.picasso.Downloader;
+import com.squareup.picasso.LruCache;
+import com.squareup.picasso.OkHttpDownloader;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
@@ -83,9 +87,19 @@ public class MyFavoriteDogsRecyclerViewAdapter extends RecyclerView.Adapter<MyFa
 
             }
         });
+        long PICASSO_DISK_CACHE_SIZE = 1024 * 1024 * 5;
 
-        Picasso.with(context)
-                .load(dogs.get(position).url)
+        // Use OkHttp as downloader
+        Downloader downloader = new OkHttpDownloader(context,
+                PICASSO_DISK_CACHE_SIZE);
+
+        // Create memory cache
+        Cache memoryCache = new LruCache(1024);
+
+        Picasso mPicasso = new Picasso.Builder(context)
+                .downloader(downloader).memoryCache(memoryCache).build();
+
+        mPicasso.load(dogs.get(position).url)
                 .resize(700,700)
                 .centerCrop()
                 .into(holder.imageDog);

@@ -18,6 +18,7 @@ import com.example.rad.funnydog.data.Dogs;
 import com.squareup.picasso.Cache;
 import com.squareup.picasso.Downloader;
 import com.squareup.picasso.LruCache;
+import com.squareup.picasso.MemoryPolicy;
 import com.squareup.picasso.OkHttpDownloader;
 import com.squareup.picasso.Picasso;
 
@@ -50,14 +51,14 @@ public class MyDogsRecyclerViewAdapter extends RecyclerView.Adapter<MyDogsRecycl
         context = parent.getContext();
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.fragment_dog, parent, false);
         // Size in bytes (10 MB)
-        long PICASSO_DISK_CACHE_SIZE = 1024 * 1024 * 10;
+        long PICASSO_DISK_CACHE_SIZE = 1024 * 1024 * 5;
 
         // Use OkHttp as downloader
         Downloader downloader = new OkHttpDownloader(context,
                 PICASSO_DISK_CACHE_SIZE);
 
         // Create memory cache
-        Cache memoryCache = new LruCache(Integer.MAX_VALUE);
+        Cache memoryCache = new LruCache(1024);
 
         mPicasso = new Picasso.Builder(context)
                 .downloader(downloader).memoryCache(memoryCache).build();
@@ -98,6 +99,7 @@ public class MyDogsRecyclerViewAdapter extends RecyclerView.Adapter<MyDogsRecycl
         mPicasso.load(dogs.get(position).url)
                 .resize(700,700)
                 .centerCrop()
+                .memoryPolicy(MemoryPolicy.NO_CACHE)
                 .into(holder.imageDog);
 
         holder.view.setOnClickListener(new View.OnClickListener() {

@@ -87,7 +87,7 @@ public class DogsFragments extends Fragment {
         });
         // Spinner Drop down elements
         List<String> categories = new ArrayList<String>();
-        for(int i = 1 ;i<= 20; i++){
+        for(int i = 1 ;i<= 10; i++){
             categories.add(""+i);
         }
 
