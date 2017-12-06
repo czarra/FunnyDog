@@ -15,6 +15,10 @@ import android.widget.Toast;
 import com.example.rad.funnydog.R;
 import com.example.rad.funnydog.data.Dogs;
 
+import com.squareup.picasso.Cache;
+import com.squareup.picasso.Downloader;
+import com.squareup.picasso.LruCache;
+import com.squareup.picasso.OkHttpDownloader;
 import com.squareup.picasso.Picasso;
 
 import org.json.JSONObject;
@@ -33,6 +37,7 @@ public class MyDogsRecyclerViewAdapter extends RecyclerView.Adapter<MyDogsRecycl
     private final DogsFragments.OnFragmentInteractionListener listener;
     private Context context;
     private SQLiteDatabase myDataBase;
+    private Picasso mPicasso;
 
     public MyDogsRecyclerViewAdapter(List<Dogs> dogs,
                                      DogsFragments.OnFragmentInteractionListener listener) {
@@ -44,6 +49,18 @@ public class MyDogsRecyclerViewAdapter extends RecyclerView.Adapter<MyDogsRecycl
     public MyDogsRecyclerViewAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         context = parent.getContext();
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.fragment_dog, parent, false);
+        // Size in bytes (10 MB)
+        long PICASSO_DISK_CACHE_SIZE = 1024 * 1024 * 10;
+
+        // Use OkHttp as downloader
+        Downloader downloader = new OkHttpDownloader(context,
+                PICASSO_DISK_CACHE_SIZE);
+
+        // Create memory cache
+        Cache memoryCache = new LruCache(Integer.MAX_VALUE);
+
+        mPicasso = new Picasso.Builder(context)
+                .downloader(downloader).memoryCache(memoryCache).build();
         return new ViewHolder(view);
     }
 
@@ -76,8 +93,9 @@ public class MyDogsRecyclerViewAdapter extends RecyclerView.Adapter<MyDogsRecycl
             Log.e("select","Erro in geting id "+ex.toString());
         }
         myDataBase.close();
-        Picasso.with(context)
-                .load(dogs.get(position).url)
+
+
+        mPicasso.load(dogs.get(position).url)
                 .resize(700,700)
                 .centerCrop()
                 .into(holder.imageDog);

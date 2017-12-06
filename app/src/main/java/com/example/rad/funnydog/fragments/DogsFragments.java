@@ -210,6 +210,7 @@ public class DogsFragments extends Fragment {
                     Dogs item = Dogs.fromJsonObject(articlesObject);
 
                     if(item!=null) {
+                        Log.d("Respose Dog",item.toString());
                         list.add(item);
                     }
                 }
