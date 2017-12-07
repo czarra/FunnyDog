@@ -87,14 +87,14 @@ public class MyFavoriteDogsRecyclerViewAdapter extends RecyclerView.Adapter<MyFa
 
             }
         });
-        long PICASSO_DISK_CACHE_SIZE = 1024 * 1024 * 5;
+        long PICASSO_DISK_CACHE_SIZE = 1024 * 1024 * 1;
 
         // Use OkHttp as downloader
         Downloader downloader = new OkHttpDownloader(context,
                 PICASSO_DISK_CACHE_SIZE);
 
         // Create memory cache
-        Cache memoryCache = new LruCache(1024);
+        Cache memoryCache = new LruCache(128);
 
         Picasso mPicasso = new Picasso.Builder(context)
                 .downloader(downloader).memoryCache(memoryCache).build();
